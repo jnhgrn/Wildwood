@@ -6,6 +6,26 @@
     <title>Wildwood, a book by Jonah Greene</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
     <style>
+        body::before, body::after {
+              content: '';
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              pointer-events: none;
+              z-index: 9999;
+          }
+
+          body::before {
+              background: lightyellow; /* Forest green */
+              mix-blend-mode: multiply;
+          }
+
+          body::after {
+              background: rgba(255, 0, 100, .3); /* Complementary reddish-purple */
+              mix-blend-mode: screen;
+          }
         body, html {
             margin: 0;
             padding: 0;
