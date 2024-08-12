@@ -105,7 +105,7 @@
             justify-content: center;
             margin-top: 20px;
         }
-        #continue-button {
+        #continue-button, #start-button {
             padding: 10px 20px;
             font-size: 18px;
             background-color: #fff;
@@ -116,9 +116,41 @@
             border-radius: 5px;
             transition: background-color 0.3s, color 0.3s;
         }
-        #continue-button:hover {
+        #continue-button:hover, #start-button:hover {
             background-color: #000;
             color: #fff;
+        }
+        #start-button {
+            margin-top: 20px;
+        }
+        #mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #mute-button:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+        #menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        #menu a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        #menu a:hover {
+            text-decoration: underline;
         }
         @media (max-width: 768px) {
             #typewriter {
@@ -127,13 +159,19 @@
             #cursor {
                 height: 16px;
             }
-            #continue-button {
+            #continue-button, #start-button {
                 font-size: 16px;
+            }
+            #menu {
+                font-size: 14px;
             }
         }
     </style>
 </head>
 <body>
+    <div id="menu">
+        <a href="#">preorder</a> | <a href="#">other books</a> | <a href="#">merch</a>
+    </div>
     <div id="loading-screen">
         <div id="loading-text">Loading</div>
     </div>
@@ -141,8 +179,11 @@
         <source src="bgvid.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
+    <audio id="voiceover" src="voiceover.wav"></audio>
+    <button id="mute-button">🔊</button>
     <div id="main-content">
         <div id="logo-wrapper"></div>
+        <button id="start-button" style="display: none;">Begin</button>
         <div id="content-wrapper">
             <div id="typewriter"></div>
         </div>
@@ -166,7 +207,7 @@
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
             const bgVideo = document.getElementById('bg-video');
-
+            
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
@@ -186,10 +227,20 @@
             });
         }
 
-        // Typewriter effect
-        const text = `The dust jacket from her copy of Where the Wild Things Are rests on my bedroom floor. I hold it in my hands every night, picturing the ragged book that she took with her still nestled inside. As my finger traces through the textured coating, the sound is eerily similar to the moment it landed on my floor – a gentle, reckless act of abandon.
+        let text = ''; // Will be populated from the file
 
-Sometimes, I wonder if she knew what she was leaving behind. Did she understand the weight of this discarded shell, this remnant of childhood tossed aside in her haste to grow up? The book itself, worn and loved, traveled with her into whatever wild rumpus she sought. But this cover, with its faded colors and dog-eared corners, became my inheritance – a constant reminder of what was and what could have been.`;
+        // Function to load text from file
+        function loadTextFromFile() {
+            return fetch('thestory.txt')
+                .then(response => response.text())
+                .then(fileContent => {
+                    text = fileContent;
+                })
+                .catch(error => {
+                    console.error('Error loading the text file:', error);
+                    text = 'Error loading the story. Please try again later.';
+                });
+        }
 
         const typewriter = document.getElementById('typewriter');
         const buttonWrapper = document.getElementById('button-wrapper');
@@ -197,13 +248,13 @@ Sometimes, I wonder if she knew what she was leaving behind. Did she understand 
 
         function getRandomTypingSpeed() {
             const speeds = [
-                { weight: 70, range: [30, 80] },    // Normal speed
-                { weight: 20, range: [20, 40] },    // Fast speed
-                { weight: 8, range: [100, 200] },   // Slow speed
-                { weight: 2, range: [300, 500] }    // Pause
+                { weight: 85, range: [23, 62] },    // Normal speed
+                { weight: 25, range: [14, 36] },    // Fast speed
+                { weight: 8, range: [90, 180] },    // Slow speed
+                { weight: 2, range: [270, 450] }    // Pause
             ];
 
-            const randomNum = Math.random() * 100;
+            const randomNum = Math.random() * 120; // Adjusted for new total weight
             let cumulativeWeight = 0;
 
             for (let speed of speeds) {
@@ -219,6 +270,9 @@ Sometimes, I wonder if she knew what she was leaving behind. Did she understand 
         }
 
         function typeWriter() {
+            if (i === 0) {
+                voiceover.play();
+            }
             if (i < text.length) {
                 if (simulateMistype() && text[i] !== ' ' && text[i] !== '\n') {
                     // Mistype
@@ -232,8 +286,8 @@ Sometimes, I wonder if she knew what she was leaving behind. Did she understand 
                             typewriter.innerHTML = text.substring(0, i + 1) + '<span id="cursor"></span>';
                             i++;
                             setTimeout(typeWriter, getRandomTypingSpeed());
-                        }, 200);
-                    }, 200);
+                        }, 180);
+                    }, 180);
                 } else {
                     typewriter.innerHTML = text.substring(0, i + 1) + '<span id="cursor"></span>';
                     i++;
@@ -272,6 +326,29 @@ Sometimes, I wonder if she knew what she was leaving behind. Did she understand 
             });
         }
 
+        // Start button functionality
+        function showStartButton() {
+            const startButton = document.getElementById('start-button');
+            startButton.style.display = 'block';
+            startButton.addEventListener('click', () => {
+                startButton.style.display = 'none';
+                loadTextFromFile().then(() => {
+                    typeWriter();
+                });
+            });
+        }
+
+        // Mute button functionality
+        const muteButton = document.getElementById('mute-button');
+        const voiceover = document.getElementById('voiceover');
+        let isMuted = false;
+
+        muteButton.addEventListener('click', () => {
+            isMuted = !isMuted;
+            voiceover.muted = isMuted;
+            muteButton.textContent = isMuted ? '🔇' : '🔊';
+        });
+
         // Start the sequence
         window.addEventListener('load', () => {
             const loadingInterval = animateLoadingText();
@@ -280,9 +357,9 @@ Sometimes, I wonder if she knew what she was leaving behind. Did she understand 
                 fadeTransition();
                 setTimeout(() => {
                     loadAnimatedLogo();
-                    typeWriter();
-                }, 1000); // Start animations 1 second after fade-in begins
-            }, 2000); // Loading screen displays for 2 seconds
+                    showStartButton();
+                }, 1000);
+            }, 2000);
         });
     </script>
 </body>
