@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildwood by Jonah Greene - Book Sale</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.9.6/lottie.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #fff;
+        }
+        #main-content {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #menu {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        #menu a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+        #menu a:hover {
+            text-decoration: underline;
+        }
+        #logo-wrapper {
+            width: 100%;
+            max-width: 620px;
+            margin-bottom: 40px;
+        }
+        #book-content {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            max-width: 1000px;
+            width: 90%;
+        }
+        #book-image {
+            width: 40%;
+            max-width: 300px;
+        }
+        #book-details {
+            width: 60%;
+            padding-left: 40px;
+        }
+        #book-title {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        #book-author {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #book-description {
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        #book-price {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #buy-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #buy-button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        #cursor {
+            display: inline-block;
+            width: 3px;
+            height: 18px;
+            background-color: #fff;
+            animation: blink 0.7s infinite;
+            margin-left: 2px;
+            vertical-align: middle;
+            opacity: 0.8;
+        }
+        @keyframes blink {
+            0% { opacity: 0.4 }
+            50% { opacity: 1 }
+            100% { opacity: 0.4 }
+        }
+        @media (max-width: 768px) {
+            #book-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            #book-image, #book-details {
+                width: 100%;
+                max-width: none;
+                padding-left: 0;
+            }
+            #book-image {
+                margin-bottom: 20px;
+            }
+            #book-title {
+                font-size: 28px;
+            }
+            #book-author {
+                font-size: 20px;
+            }
+            #book-description {
+                font-size: 16px;
+            }
+            #menu {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div id="menu">
+      <a href="book.html">preorder</a> | <a href="#">other books</a> | <a href="#">merch</a> | <a href="index.html">home</a>
+  </div>
+    <div id="main-content">
+        <div id="logo-wrapper"></div>
+        <div id="book-content">
+            <img id="book-image" src="bookcover.png" alt="Wildwood Book Cover">
+            <div id="book-details">
+                <h1 id="book-title">Wildwood</h1>
+                <h2 id="book-author">by Jonah Greene</h2>
+                <p id="book-description"></p>
+                <p id="book-price">$16.99</p>
+                <button id="buy-button">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load and play the Lottie animation
+        function loadAnimatedLogo() {
+            lottie.loadAnimation({
+                container: document.getElementById('logo-wrapper'),
+                renderer: 'svg',
+                loop: false,
+                autoplay: true,
+                path: 'svg_animation.json' // Make sure this points to your JSON file
+            });
+        }
+
+        const description = `A captivating journey through the untamed wilderness of the human heart. Wildwood weaves a spellbinding tale of love, loss, and self-discovery against the backdrop of nature's raw beauty. Join our protagonist as they navigate the complexities of life, finding solace and challenge in the depths of the forest. This debut novel from Jonah Greene will leave you breathless and yearning for your own wild adventure.`;
+
+        const descriptionElement = document.getElementById('book-description');
+        let i = 0;
+
+        function getRandomTypingSpeed() {
+            const speeds = [
+                { weight: 95, range: [25, 32] },    // Normal speed
+                { weight: 25, range: [10, 26] },    // Fast speed
+                { weight: 8, range: [70, 100] },    // Slow speed
+                { weight: 2, range: [20, 20] }    // Pause
+            ];
+
+            const randomNum = Math.random() * 120;
+            let cumulativeWeight = 0;
+
+            for (let speed of speeds) {
+                cumulativeWeight += speed.weight;
+                if (randomNum <= cumulativeWeight) {
+                    return Math.floor(Math.random() * (speed.range[1] - speed.range[0] + 1)) + speed.range[0];
+                }
+            }
+        }
+
+        function typeDescription() {
+            if (i < description.length) {
+                descriptionElement.innerHTML = description.substring(0, i + 1) + '<span id="cursor"></span>';
+                i++;
+                setTimeout(typeDescription, getRandomTypingSpeed());
+            } else {
+                descriptionElement.innerHTML = description;
+            }
+        }
+
+        // Start the sequence
+        window.addEventListener('load', () => {
+            loadAnimatedLogo();
+            setTimeout(typeDescription, 1000); // Start typing description after 1 second
+        });
+
+        // Buy button functionality
+        document.getElementById('buy-button').addEventListener('click', () => {
+            alert('Thank you for your interest! This would typically link to a checkout process.');
+        });
+    </script>
+</body>
+</html>
