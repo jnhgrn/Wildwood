@@ -44,12 +44,13 @@
         }
         #bg-video {
             position: fixed;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
             min-width: 100%;
             min-height: 100%;
             width: auto;
             height: auto;
+            transform: translate(-50%, -50%);
             object-fit: cover;
             opacity: 0;
             transition: opacity 2s ease-in;
@@ -57,9 +58,11 @@
         }
         @media (max-width: 768px) and (orientation: portrait) {
             #bg-video {
+                top: 50%;
+                left: 50%;
                 width: 100vh;
                 height: 100vw;
-                transform: rotate(90deg);
+                transform: translate(-50%, -50%) rotate(90deg);
                 object-fit: cover;
             }
         }
@@ -163,7 +166,7 @@
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
             const bgVideo = document.getElementById('bg-video');
-            
+
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
